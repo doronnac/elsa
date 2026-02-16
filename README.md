@@ -1,8 +1,16 @@
-# ❄️ Elsa
+# ❄️ ELSA - Embedded Language Study Agent
 
-**Elsa** is an experimental, text-based Role-Playing Game (RPG) where your survival depends on social intuition and situational awareness. 
+**ELSA** is an experimental, text-based Role-Playing Game where your survival depends on social intuition and situational awareness.
 
 This project is a **Proof of Concept (PoC)** for a localized language-learning platform. It uses a Small Language Model (SLM) running locally to act as a "Logic Judge," determining if your behavior is appropriate for a given scenario.
+
+---
+
+### Motivation
+
+Tried many apps and method. Some worked better than others, all were boring.
+
+ELSA is built around established research regarding Scenario Based Learning (SBL), showing increased efficacy when learning to speak under simulated real-life scenarios.
 
 ---
 
@@ -15,15 +23,16 @@ This project is a **Proof of Concept (PoC)** for a localized language-learning p
 ### Installation
    ```bash
    # Clone
-   git clone [https://github.com/doronnac/elsa.git](https://github.com/doronnac/elsa.git)
+   git clone https://github.com/doronnac/elsa.git
    cd elsa
    
    # Run
    cargo run --release [path-to-model-file]
    ```
+   
 ---
 
-### 🎮 The Game Loop
+### Game Loop
 
 So far only a single, brief scenario has been built. This loop represents the broader vision for the engine.
 
@@ -34,17 +43,21 @@ So far only a single, brief scenario has been built. This loop represents the br
 
 ---
 
-### 🧠 Technical Architecture
+### Technical Architecture
 
-Elsa is built to be private, fast, and entirely local. By using **llama.cpp**, the game runs without an internet connection or API fees. I specifically tested language models with the goal of going as small as possible, and ended up choosing SmolLM3 for several reasons:
+ELSA is built to be private, fast, and entirely local. By using **llama.cpp**, the game runs without an internet connection or API fees.
+
+I specifically tested language models with the goal of going as small as possible, and ended up choosing SmolLM3 for several reasons:
 - Reasoning models performed better for this task than much larger Instruct counterparts.
 - Out of the reasoning models - SmolLM3 seems to have been the best compromise between accuracy, speed, size and language support.
+
+Expect more models to be natively supported as time goes on.
 
 ---
 
 ### 🧩 Technical Challenges
 
-The biggest hurdle so far is *consistency*, though current results are reassuringly positive. Even without exhausting advanced "correctness" mechanisms, the model responds surprisingly well to straightforward prompt engineering.
+The biggest hurdle so far is *consistency*, though current results are reassuringly positive; Even without exhausting advanced "correctness" mechanisms, the model responds surprisingly well to straightforward prompt engineering.
 
 However, as scenarios increase in size and divergence, I fully expect the "logic drift" to exacerbate. To combat this, the project will place a heavy emphasis on adopting systems to ensure 100% reliability:
 
@@ -59,11 +72,3 @@ However, as scenarios increase in size and divergence, I fully expect the "logic
 - Fine-Tuning: Exploring LoRA or full fine-tunes on smaller models (1B-3B) specifically for logic validation tasks.
 
 ---
-
-### 🤔 Ok but why?
-
-We all want to know many languages, but actually learning them can be really boring.
-
-I’ve tried many apps, and they are usually one of three things: too slow, mind-numbingly repetitive, or "AI-enabled" slop designed to trick you into a subscription. My goal with Elsa is to see how far I can push the boundaries of fully-local LLMs.
-
-So far, the results show that you don't need a massive cloud API to create a meaningful, high-stakes learning environment.
