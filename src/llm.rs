@@ -2,7 +2,7 @@ use std::num::NonZeroU32;
 use std::pin::pin;
 
 use anyhow::{Context, Result};
-use log::{debug, info, trace, warn};
+use log::{debug, info, trace};
 use regex::Regex;
 use serde::Deserialize;
 
@@ -86,35 +86,6 @@ impl Default for ModelConfig {
 }
 
 // ---------------------------------------------------------------------------
-// GBNF grammar builder
-// ---------------------------------------------------------------------------
-
-/// Build a GBNF grammar that forces the output to be exactly:
-///   {"decision": "<one of choices>", "reason": "<free text>"}
-fn build_json_grammar(valid_choices: &[&str]) -> String {
-    let alts: Vec<String> = valid_choices
-        .iter()
-        .map(|c| format!(r#""\"{}\"""#, c))
-        .collect();
-    let decision_rule = alts.join(" | ");
-
-    // Changes made:
-    // 1. Added 'ws' at the very start of 'root'. This allows leading newlines/spaces.
-    // 2. Added 'ws' at the very end.
-    // 3. Simplified reason-char regex slightly for stability.
-    format!(
-        r#"
-        root        ::= ws "{{" ws "\"decision\"" ws ":" ws decision ws "," ws "\"reason\"" ws ":" ws reason ws "}}" ws
-        decision    ::= {decision_rule}
-        reason      ::= "\"" reason-char* "\""
-        reason-char ::= [^"\\] | "\\" escape-char
-        escape-char ::= ["\\/bfnrt]
-        ws          ::= [ \t\n\r]*
-    "#
-    )
-}
-
-// ---------------------------------------------------------------------------
 // Sampler builders
 // ---------------------------------------------------------------------------
 
@@ -176,7 +147,7 @@ impl LLM {
         let ctx_params = LlamaContextParams::default().with_n_ctx(Some(
             NonZeroU32::new(config.n_ctx).expect("n_ctx must be > 0"),
         ));
-        let mut ctx = model
+        let ctx = model
             .new_context(backend, ctx_params)
             .context("failed to create inference context")?;
 

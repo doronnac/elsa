@@ -1,5 +1,4 @@
 mod game;
-mod game_tree;
 mod llm;
 
 use anyhow::{Context, Result};
@@ -37,7 +36,7 @@ fn main() -> Result<()> {
 
     let mut loaded_model = LLM::load_model(model_path, config).context("failed to load model")?;
 
-    let tree = game_tree::airport_security_scenario();
+    let tree = game::tree::airport_security_scenario();
 
     game::run(&mut loaded_model, tree)
 }
