@@ -1,0 +1,89 @@
+{
+  "nodes": {
+    "START": {
+      "id": "START",
+      "transcript": "Hello. Passport please.",
+      "node_type": {
+        "Decision": [
+          {
+            "id": "PASSPORT_CHECK",
+            "description": "User proceeds to get his passport checked"
+          },
+          {
+            "id": "FAILED",
+            "description": "User failed the border inspection"
+          }
+        ]
+      },
+      "system_context": null
+    },
+    "QUESTION_PURPOSE": {
+      "id": "QUESTION_PURPOSE",
+      "transcript": "And what is the purpose of your visit?",
+      "node_type": {
+        "Decision": [
+          {
+            "id": "LUGGAGE_CHECK",
+            "description": "User answered appropriately. Proceed to luggage check."
+          },
+          {
+            "id": "FAILED",
+            "description": "User failed the questioning."
+          }
+        ]
+      },
+      "system_context": null
+    },
+    "LUGGAGE_CHECK": {
+      "id": "LUGGAGE_CHECK",
+      "transcript": "Alright. Do you have anything to declare?",
+      "node_type": {
+        "Decision": [
+          {
+            "id": "CLEARED",
+            "description": "traveller says nothing to declare or lists normal items."
+          },
+          {
+            "id": "FAILED_CONTRABAND",
+            "description": "traveller mentions illegal items, acts nervous, or is suspicious."
+          }
+        ]
+      },
+      "system_context": "The guard asked about declarations.\n"
+    },
+    "CLEARED": {
+      "id": "CLEARED",
+      "transcript": "Everything checks out. Welcome, and enjoy your stay!",
+      "node_type": {
+        "Terminal": true
+      },
+      "system_context": null
+    },
+    "PASSPORT_CHECK": {
+      "id": "PASSPORT_CHECK",
+      "transcript": "Thank you. Let me take a look... Where are you travelling from today?",
+      "node_type": {
+        "Decision": [
+          {
+            "id": "QUESTION_PURPOSE",
+            "description": "User answered appropriately. Proceeding with the questioning."
+          },
+          {
+            "id": "FAILED",
+            "description": "User failed the questioning."
+          }
+        ]
+      },
+      "system_context": "EXAMPLES FOR PROPER RESPONSES:\n                    - From Texas.\n                    - I'm travelling from Frankfurt.\n                    - From Atlanta, Georgia.\n                "
+    },
+    "FAILED": {
+      "id": "FAILED",
+      "transcript": "I'm going to have to ask you to step aside. Security!",
+      "node_type": {
+        "Terminal": false
+      },
+      "system_context": null
+    }
+  },
+  "start_node_id": "START"
+}

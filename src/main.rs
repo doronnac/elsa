@@ -4,39 +4,50 @@ mod llm;
 use anyhow::{Context, Result};
 use llm::{ModelConfig, LLM};
 
+use crate::game::tree::GameTree;
+
 fn main() -> Result<()> {
     // Initialize logging. Control verbosity with RUST_LOG env var:
     //   RUST_LOG=info   cargo run -- model.gguf   # messages + transitions
     //   RUST_LOG=debug  cargo run -- model.gguf   # + judge instructions + parsed JSON
     //   RUST_LOG=trace  cargo run -- model.gguf   # + full rendered prompt template
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info"))
+        .target(env_logger::Target::Stdout)
         .format_timestamp_millis()
         .init();
 
     let args: Vec<String> = std::env::args().collect();
 
     let model_path = args.get(1).context(
-        "Usage: elsa <path-to-model.gguf> [gpu_layers] [context_size] [max_tokens]\n\
-         \n\
-         Example:\n  elsa ./models/qwen2.5-3b-instruct-q4_k_m.gguf 99 8092 1024\n\
-         \n\
-         Logging: set RUST_LOG=debug or RUST_LOG=trace for verbose output",
+        "
+        Usage: cargo run <path-to-model.gguf> <path-to-scenario.json>
+        \n\
+        Example:\n  cargo run ./SmolLM3-Q4_K_M ./scenarios/airport.json \n\
+    ",
+    )?;
+
+    let scenario = args.get(2).context(
+        "
+        Usage: cargo run <path-to-model.gguf> <path-to-scenario.json>
+        \n\
+        Example:\n  cargo run ./SmolLM3-Q4_K_M ./scenarios/airport.json \n\
+    ",
     )?;
 
     let config = ModelConfig {
-        n_gpu_layers: args.get(2).and_then(|s| s.parse().ok()).unwrap_or(0),
-        n_ctx: args.get(3).and_then(|s| s.parse().ok()).unwrap_or(8092),
-        max_tokens: args.get(4).and_then(|s| s.parse().ok()).unwrap_or(1024),
+        n_gpu_layers: 0,
+        n_ctx: 8092,
+        max_tokens: 1024,
     };
 
-    println!("Loading model: {model_path}");
-    println!("  GPU layers : {}", config.n_gpu_layers);
-    println!("  Context    : {}", config.n_ctx);
-    println!("  Max tokens : {}", config.max_tokens);
+    eprintln!("Loading model: {model_path}");
+    eprintln!("GPU layers : {}", config.n_gpu_layers);
+    eprintln!("Context    : {}", config.n_ctx);
+    eprintln!("Max tokens : {}", config.max_tokens);
 
-    let mut loaded_model = LLM::load_model(model_path, config).context("failed to load model")?;
+    let mut model = LLM::load_model(model_path, config).context("failed to load model")?;
 
-    let tree = game::tree::airport_security_scenario();
+    let game_tree: GameTree = serde_json::from_str(&std::fs::read_to_string(scenario)?)?;
 
-    game::run(&mut loaded_model, tree)
+    game::run(&mut model, game_tree)
 }

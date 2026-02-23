@@ -1,7 +1,7 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// A single node in the game's decision tree.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameNode {
     /// Unique identifier for this node (e.g. "START", "QUESTION_1", "FAILED").
     pub id: String,
@@ -14,7 +14,7 @@ pub struct GameNode {
     pub system_context: Option<String>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NextNode {
     // ID of an existing node
     pub id: String,
@@ -22,7 +22,7 @@ pub struct NextNode {
     pub description: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum NodeType {
     // Terminal node (is_success)
     Terminal(bool),

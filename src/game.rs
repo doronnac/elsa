@@ -24,7 +24,6 @@ struct GameState {
     /// are injected at query time to avoid confusing small models with stale
     /// instructions from previous steps.
     conversation: Vec<ChatMessage>,
-    visited_game_nodes: Vec<GameNode>,
     /// Number of non-terminal steps the player has completed.
     steps_completed: usize,
 }
@@ -37,7 +36,6 @@ impl GameState {
             current_node_id: start_id,
             conversation: Vec::new(),
             steps_completed: 0,
-            visited_game_nodes: vec![],
         }
     }
 
@@ -56,16 +54,6 @@ const SYSTEM_PROMPT: &str = "\
 You are a border security guard at an airport. You are having a conversation with a traveller. Your job is to categorize the Traveller's last response based on the following rules:";
 
 /// Build the complete message list for an LLM judge call.
-///
-/// Structure (kept minimal for small models):
-///   [system] brief role prompt
-///   [assistant] guard line 1
-///   [user] traveller response 1
-///   ...ongoing conversation...
-///   [system] judge instruction with decision criteria
-///
-/// Previous-node system_context is NOT included — only the current
-/// node's criteria appear, right before the model generates.
 fn build_judge_messages(state: &GameState, historical_node: &GameNode) -> Vec<ChatMessage> {
     let mut messages = Vec::new();
 
@@ -96,13 +84,20 @@ fn build_judge_instruction(node: &GameNode) -> String {
                 s.push_str("\n\n");
             }
 
-            let options: Vec<&str> = next_nodes.iter().map(|n| n.id.as_str()).collect();
+            let options: Vec<String> = next_nodes
+                .iter()
+                .map(|n| format!("id: {}, description: {}", n.id, n.description))
+                .collect();
             let options_str = options.join(", ");
 
-            s.push_str(&format!(
-        "Pick one: {options_str}\n\
-         Reply with JSON only: {{\"decision\": \"<PICK>\", \"reason\": \"<why>\"}}. JSON must be valid."
-    ));
+            s.push_str(&format!("
+                Pick one: {options_str}\n
+                Reply with JSON only: {{\"decision\": \"<PICK>\", \"reason\": \"<why>\"}}. JSON must be valid.
+            "));
+
+            if let Some(sc) = node.system_context.clone() {
+                s.push_str(sc.as_str());
+            }
 
             s
         }
@@ -187,7 +182,7 @@ fn play_round(model: &mut LLM, tree: &GameTree) -> Result<GameOutcome> {
         let node = state.current_node().clone();
         info!("Current node: {}. node_type {:?}", node.id, node.node_type);
 
-        println!("\n[Guard]: {}", node.transcript);
+        println!("\n{}", node.transcript);
 
         state
             .conversation
@@ -277,12 +272,6 @@ fn play_round(model: &mut LLM, tree: &GameTree) -> Result<GameOutcome> {
 
 pub fn run(model: &mut LLM, tree: GameTree) -> Result<()> {
     loop {
-        println!("\n========================================");
-        println!("   AIRPORT BORDER CONTROL SIMULATOR");
-        println!("========================================");
-        println!("Try to pass through border control.");
-        println!("Type your responses naturally.\n");
-
         let outcome = play_round(model, &tree)?;
         show_game_over(&outcome);
 

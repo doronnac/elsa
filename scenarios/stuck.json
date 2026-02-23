@@ -1,0 +1,109 @@
+{
+  "nodes": {
+    "START": {
+      "id": "START",
+      "transcript": "Hey, I'm standing in the hallway and I can't get into my apartment. I think I'm locked out. What should I do?",
+      "node_type": {
+        "Decision": [
+          {
+            "id": "ASSESS_SITUATION",
+            "description": "User asks if the friend has their keys or if the door is just stuck."
+          },
+          {
+            "id": "STILL_STUCK",
+            "description": "User gives unhelpful advice or tells the friend to just wait."
+          }
+        ]
+      },
+      "system_context": "The friend is panicked. Validating the situation or asking for details is the best first step."
+    },
+    "ASSESS_SITUATION": {
+      "id": "ASSESS_SITUATION",
+      "transcript": "I have my keys in my hand, but when I put the key in the deadbolt, it won't budge. It feels jammed.",
+      "node_type": {
+        "Decision": [
+          {
+            "id": "MECHANICAL_FIX",
+            "description": "User suggests a physical adjustment like lifting the door or using lubricant."
+          },
+          {
+            "id": "CHECK_SPARE",
+            "description": "User suggests checking for a secondary entrance or a spare key."
+          },
+          {
+            "id": "FAILED_LOCK",
+            "description": "User suggests forcing the door open or kicking it."
+          }
+        ]
+      },
+      "system_context": "The key is present but the mechanism is the issue. Focus on 'jiggling', 'lifting', or 'WD-40'."
+    },
+    "MECHANICAL_FIX": {
+      "id": "MECHANICAL_FIX",
+      "transcript": "Okay, I'm pulling the handle upward while I turn the key... wait, I hear a click! Should I keep turning?",
+      "node_type": {
+        "Decision": [
+          {
+            "id": "SUCCESS",
+            "description": "User tells them to turn it firmly but gently."
+          },
+          {
+            "id": "STILL_STUCK",
+            "description": "User tells them to stop before they break the key."
+          }
+        ]
+      },
+      "system_context": "Success is imminent. The user needs to encourage the final action."
+    },
+    "CHECK_SPARE": {
+      "id": "CHECK_SPARE",
+      "transcript": "The windows are all locked. Do you remember if we left that spare key with the neighbor, or is it still under the 'fake rock'?",
+      "node_type": {
+        "Decision": [
+          {
+            "id": "SUCCESS",
+            "description": "User correctly identifies the spare key location (the neighbor or the rock)."
+          },
+          {
+            "id": "FAILED_SECURITY",
+            "description": "User suggests breaking a window or picking the lock."
+          }
+        ]
+      },
+      "system_context": "EXAMPLES FOR SPARE LOCATIONS:\n - Check the neighbor in 4B.\n - Look under the fake rock by the planter.\n - It's in your gym bag."
+    },
+    "SUCCESS": {
+      "id": "SUCCESS",
+      "transcript": "It worked! The door finally opened. I'm inside now. Thanks for talking me through that!",
+      "node_type": {
+        "Terminal": true
+      },
+      "system_context": null
+    },
+    "STILL_STUCK": {
+      "id": "STILL_STUCK",
+      "transcript": "That didn't help at all. I'm still out here, it's freezing, and I have ice cream melting in my grocery bag.",
+      "node_type": {
+        "Terminal": false
+      },
+      "system_context": null
+    },
+    "FAILED_LOCK": {
+      "id": "FAILED_LOCK",
+      "transcript": "I tried to force it and now the key is snapped off inside the lock. I'm definitely not getting in now.",
+      "node_type": {
+        "Terminal": false
+      },
+      "system_context": "The user suggested a destructive action which resulted in a worse situation."
+    },
+    "FAILED_SECURITY": {
+      "id": "FAILED_SECURITY",
+      "transcript": "I tried to climb the fire escape to check the window, but the building manager saw me and called security. I have to go deal with this.",
+      "node_type": {
+        "Terminal": false
+      },
+      "system_context": null
+    }
+  },
+  "start_node_id": "START"
+}

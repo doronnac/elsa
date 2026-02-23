@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::game::node::{GameNode, NextNode, NodeType};
 
 /// The full scenario tree: a map of node-id -> GameNode.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameTree {
     pub nodes: HashMap<String, GameNode>,
     pub start_node_id: String,
